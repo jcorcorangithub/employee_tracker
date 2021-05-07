@@ -3,7 +3,7 @@ const inquirer = require('inquirer');
 
 const connection = mysql.createConnection({
     host: 'localhost',
-    port: 8080,
+    port: 3306,
     user: 'root',
     password: '',
     database: 'employee_trackingDB',
@@ -24,7 +24,7 @@ const connection = mysql.createConnection({
                 'add a department',
                 'add a role',
                 'add an employee',
-                'view a department',
+                'view departments',
                 'view a role',
                 'view an employee',
                 'update employee role',
@@ -38,31 +38,31 @@ const connection = mysql.createConnection({
         .then((answer) => {
             switch (answer.action) {
                 case 'add a department':
-                    //function
+                    addDepartment();
                     break;
         
                 case 'add a role':
-                    //function
+                    addRole();
                     break;
         
                 case 'add an employee':
-                    //function
+                    addEmployee();
                     break;
         
-                case 'view a department':
-                    //function
+                case 'view departments':
+                    viewDepartments();
                     break;
         
                 case 'view a role':
-                    //function
+                    viewRoles();
                     break;
         
                 case 'view an employee':
-                    //function
+                    viewEmployees();
                     break;
 
                 case 'update employee role':
-                    //function
+                    updateEmployeeRole();
                     break;
                 
                 // case 'update employee managers':
@@ -85,29 +85,133 @@ const connection = mysql.createConnection({
                 //     //function
                 //     break;
         
-                default:
-                  console.log(`Invalid action: ${answer.action}`);
-                  break;
+                // default:
+                //   console.log(`Invalid action: ${answer.action}`);
+                //   break;
               }
         });
   };
 
-  const addDepartment = () => {
-      inquirer
-        .prompt([
-            {
-                name: 'id',
-                type: 'input',
-                message: "enter the id of the department",
-            },
-            {
-                name: 'id',
-                type: 'input',
-                message: "enter the name of the department",
-            },
-        ])
-        .then(function(answers){
-            //this is where the query will be written 
-            //the promptUser function will also be called again
-        });
-  };
+//   const getAllRoleid = ()=>{
+//       //connection to role table and grab all ids and store it into an array and return it out
+//       //this needs to be a key value pair (1 = HR )
+//       //return arrayId;
+//   }
+
+const addDepartment = () => {
+    inquirer
+    .prompt(
+        {
+            name: 'name',
+            type: 'input',
+            message: "enter the name of the department",
+        },
+    )
+    .then(function(answer){
+        connection.query(
+            'insert into departments (name) values (?)',
+            answer.name, 
+            (err, res) => {
+                if (err) throw err;
+                console.log('Your department was created successfully!');
+                promptUser();
+            })
+    });
+};
+
+const viewDepartments = () => {
+    connection.query(`select * from departments`,
+    (err, res) => {
+        console.table(res);
+        promptUser();
+    });
+};
+
+//TODO add department id
+const addRole = () => {
+    inquirer
+    .prompt([
+        {
+            name: 'role',
+            type: 'input',
+            message: 'enter the title of the new role you would like to have',
+        },
+        {
+            name: 'salary',
+            type: 'input',
+            message: 'enter the salary of this new role',
+        },
+    ])
+    .then(function(answer){
+        connection.query(
+            'insert into role (title, salary) values (?,?)',
+            [answer.role, answer.salary],
+            (err, res) => {
+                if (err) throw err;
+                console.log('the new role was created successfully!');
+                promptUser();
+            })
+    });
+};
+
+const viewRoles = () => {
+    connection.query(`select * from roles`,
+    (err, res) => {
+        console.table(res);
+        promptUser();
+    });
+    
+};
+
+//TODO add role id and manager id
+const addEmployee = () => {
+    inquirer
+    .prompt([
+        {
+            name: 'employeefirstname',
+            type: 'input',
+            message: 'enter the first name of the new employee',
+        },
+        {
+            name: 'employeelastname',
+            type: 'input',
+            message: 'enter the last name of the new employee',
+        },
+    ])
+    .then(function(answer){
+        connection.query(
+            'insert into roles (first_name, last_name) values (?,?)',
+            [answer.employeefirstname, answer.employeelastname ],
+            (err, res) => {
+                if (err) throw err;
+                console.log('the new employee was created successfully!');
+                promptUser();
+            })
+    });
+};
+
+const viewEmployees = () => {
+    connection.query(`select * from employees`,
+    (err, res) => {
+        console.table(res);
+        promptUser();
+    });
+    
+};
+
+const employeeArray = [connection.query()];
+const updateEmployeeRole = () => {
+    
+    inquirer
+    .prompt({
+        name: 'action',
+        type: 'rawlist',
+        message: 'Which employee would you like to uodate?',
+        choices: [
+            employeeArray
+        ]
+    })
+    .then(function(answer){
+        
+    });
+};
