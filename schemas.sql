@@ -13,7 +13,7 @@ create table roles (
     title varchar(30),
     salary decimal,
     department_id int,
-    constraint fk_department foreign key (department_id) references department(id)
+    constraint fk_department foreign key (department_id) references departments(id)
 );
 
 create table employees (
@@ -21,7 +21,7 @@ create table employees (
     first_name varchar(30),
     last_name varchar(30),
     role_id int,
-    constraint fk_role foreign key (role_id) references role(id), 
+    constraint fk_role foreign key (role_id) references roles(id), 
     manager_id int,
-    constraint fk_manager foreign key (manager_id) references role(id) 
+    constraint fk_manager foreign key (manager_id) references roles(id) 
 )

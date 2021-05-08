@@ -199,19 +199,48 @@ const viewEmployees = () => {
     
 };
 
-const employeeArray = [connection.query()];
+
 const updateEmployeeRole = () => {
+    const employeeArray = [];
+    connection.query('select * from employees', function(err, res) {
+        if (err) throw err;
+        for(i = 0; i < res.length; i++){
+            employeeArray.push(res[i].id);
+        }
+        console.log(employeeArray);
+    });
+    const roleArray = [];
+    connection.query('select * from roles', function(err, res) {
+        if (err) throw err;
+        for(i = 0; i < res.length; i++){
+            roleArray.push(res[i]);
+        }
+    });
+    //take the array of id's and use that 
     
     inquirer
-    .prompt({
-        name: 'action',
-        type: 'rawlist',
-        message: 'Which employee would you like to uodate?',
-        choices: [
-            employeeArray
-        ]
-    })
+    .prompt(
+        {
+            name: 'employee',
+            type: 'rawlist',
+            message: 'Which employee would you like to update?',
+            choices: [{employeeArray}]
+        }, 
+        {
+            name: 'role',
+            type: 'rawlist',
+            message: 'choose the new role you would like this employee to have',
+            choices: [{roleArray}]
+        }
+    )
     .then(function(answer){
-        
+        connection.query('update employees set role_id = ? where ?',
+        [answer.role.id, answer.employee.id],
+        (err, res) => {
+            if (err) throw err;
+            console.log('the employee role was updated successfully!');
+            promptUser();
+        })
+            
     });
 };
