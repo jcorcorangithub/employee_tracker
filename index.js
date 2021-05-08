@@ -201,46 +201,49 @@ const viewEmployees = () => {
 
 
 const updateEmployeeRole = () => {
-    const employeeArray = [];
+    let employeeArray = [];
     connection.query('select * from employees', function(err, res) {
+        console.log(res);
         if (err) throw err;
         for(i = 0; i < res.length; i++){
-            employeeArray.push(res[i].id);
+            console.log(res[i]+" line 208");
+            employeeArray.push(res[i]);
         }
         console.log(employeeArray);
+        // find a way to parse the info in the array 
+        
     });
-    const roleArray = [];
-    connection.query('select * from roles', function(err, res) {
-        if (err) throw err;
-        for(i = 0; i < res.length; i++){
-            roleArray.push(res[i]);
-        }
-    });
-    //take the array of id's and use that 
-    
-    inquirer
-    .prompt(
-        {
-            name: 'employee',
-            type: 'rawlist',
-            message: 'Which employee would you like to update?',
-            choices: [{employeeArray}]
-        }, 
-        {
-            name: 'role',
-            type: 'rawlist',
-            message: 'choose the new role you would like this employee to have',
-            choices: [{roleArray}]
-        }
-    )
-    .then(function(answer){
-        connection.query('update employees set role_id = ? where ?',
-        [answer.role.id, answer.employee.id],
-        (err, res) => {
-            if (err) throw err;
-            console.log('the employee role was updated successfully!');
-            promptUser();
-        })
+    // let roleArray = [];
+    // connection.query('select * from roles', function(err, res) {
+    //     if (err) throw err;
+    //     for(i = 0; i < res.length; i++){
+    //         roleArray.push(res[i]);
+    //     }
+    // });
+
+    // inquirer
+    // .prompt(
+    //     {
+    //         name: 'employee',
+    //         type: 'rawlist',
+    //         message: 'Which employee would you like to update?',
+    //         choices: [{employeeArray}]
+    //     }, 
+    //     {
+    //         name: 'role',
+    //         type: 'rawlist',
+    //         message: 'choose the new role you would like this employee to have',
+    //         choices: [{roleArray}]
+    //     }
+    // )
+    // .then(function(answer){
+    //     connection.query('update employees set role_id = ? where ?',
+    //     [answer.role.id, answer.employee.id],
+    //     (err, res) => {
+    //         if (err) throw err;
+    //         console.log('the employee role was updated successfully!');
+    //         promptUser();
+    //     })
             
-    });
+    // });
 };
