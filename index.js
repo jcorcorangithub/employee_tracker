@@ -123,35 +123,49 @@ const viewDepartments = () => {
 
 //TODO add department id
 const addRole = () => {
-    inquirer
-        .prompt([
-            {
-                name: 'role',
-                type: 'input',
-                message: 'enter the title of the new role you would like to have',
-            },
-            {
-                name: 'salary',
-                type: 'input',
-                message: 'enter the salary of this new role',
-            },
-            {
-                name: 'department',
-                type: 'list',
-                message: 'What would you like to do?',
-                choices: [...depArray]
-            }
-        ])
-        .then(function (answer) {
-            connection.query(
-                'insert into roles (title, salary) values (?,?)',
-                [answer.role, answer.salary],
-                (err, res) => {
-                    if (err) throw err;
-                    console.log('the new role was created successfully!');
-                    promptUser();
-                })
-        });
+    let depArray = [];
+    connection.query('select * from departments', function (err, res) {
+        if (err) throw err;
+        for (i = 0; i < res.length; i++) {
+            depArray[res[i].id - 1] = `${res[i].name}, ${res[i].id}`;
+        }
+        
+        inquirer
+            .prompt([
+                {
+                    name: 'role',
+                    type: 'input',
+                    message: 'enter the title of the new role you would like to have: ',
+                },
+                {
+                    name: 'salary',
+                    type: 'input',
+                    message: 'enter the salary of this new role: ',
+                },
+                {
+                    name: 'department',
+                    type: 'list',
+                    message: 'What department do you want this role to be assigned to? ',
+                    choices: [...depArray]
+                }
+            ])
+            .then(function (answer) {
+                connection.query(
+                    'insert into roles (title, salary) values (?,?)',
+                    [answer.role, answer.salary],
+                    (err, res) => {
+                        if (err) throw err;
+                    })
+                let dep = answer.department.split(',');
+                connection.query(
+                    'insert into roles(department_id) values (?)',
+                    [dep[1]],
+                    (err, res) => {
+                        if (err) throw err;
+                        promptUser();
+                });
+            });
+    })
 };
 
 
@@ -174,13 +188,25 @@ const addEmployee = () => {
             {
                 name: 'employeefirstname',
                 type: 'input',
-                message: 'enter the first name of the new employee',
+                message: 'enter the first name of the new employee: ',
             },
             {
                 name: 'employeelastname',
                 type: 'input',
-                message: 'enter the last name of the new employee',
+                message: 'enter the last name of the new employee: ',
             },
+            {    
+                name: 'employeerole',
+                type: 'list',
+                message: 'choose the role this employee will have: ',
+                choices: []
+            },
+            {
+                name: 'employeemanager',
+                type: 'list',
+                message: 'choose who you will want to manage this employee: ',
+                choices: []
+            }
         ])
         .then(function (answer) {
             connection.query(
@@ -223,13 +249,13 @@ const updateEmployeeRole = () => {
                     {
                         name: 'employee',
                         type: 'list',
-                        message: 'Which employee would you like to update?',
+                        message: 'Which employee would you like to update? ',
                         choices: [...employeeArray]
                     },
                     {
                         name: 'role',
                         type: 'list',
-                        message: 'choose the new role you would like this employee to have',
+                        message: 'choose the new role you would like this employee to have: ',
                         choices: [...roleArray]
                     }
                 ])
@@ -238,7 +264,6 @@ const updateEmployeeRole = () => {
                     let rle = answer.role.split(',');
                     
                     connection.query('update employees set role_id = ? where id = ?',
-                    
                     [rle[1], empl[2]],
                     (err, res) => {
                         if (err) throw err;
