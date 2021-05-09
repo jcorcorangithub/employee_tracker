@@ -26,7 +26,7 @@ const promptUser = () => {
                 'add an employee',
                 'view departments',
                 'view a role',
-                'view an employee',
+                'view employees',
                 'update employee role',
                 // 'update employee managers',
                 // 'view employees by manager',
@@ -57,7 +57,7 @@ const promptUser = () => {
                     viewRoles();
                     break;
 
-                case 'view an employee':
+                case 'view employees':
                     viewEmployees();
                     break;
 
@@ -91,12 +91,6 @@ const promptUser = () => {
             }
         });
 };
-
-//   const getAllRoleid = ()=>{
-//       //connection to role table and grab all ids and store it into an array and return it out
-//       //this needs to be a key value pair (1 = HR )
-//       //return arrayId;
-//   }
 
 const addDepartment = () => {
     inquirer
@@ -141,10 +135,16 @@ const addRole = () => {
                 type: 'input',
                 message: 'enter the salary of this new role',
             },
+            {
+                name: 'department',
+                type: 'list',
+                message: 'What would you like to do?',
+                choices: [...depArray]
+            }
         ])
         .then(function (answer) {
             connection.query(
-                'insert into role (title, salary) values (?,?)',
+                'insert into roles (title, salary) values (?,?)',
                 [answer.role, answer.salary],
                 (err, res) => {
                     if (err) throw err;
@@ -153,6 +153,10 @@ const addRole = () => {
                 })
         });
 };
+
+
+
+
 
 const viewRoles = () => {
     connection.query(`select * from roles`,
@@ -199,42 +203,20 @@ const viewEmployees = () => {
 
 };
 
-// const getEmployeeArray = () => {
-//     let employeeArray = [];
-//     connection.query('select * from employees', function (err, res) {
-//         if (err) throw err;
-//         for (i = 0; i < res.length; i++) {
-//             employeeArray[res[i].id - 1] = `${res[i].last_name}, ${res[i].first_name}`;
-//         };
-//         return employeeArray;
-//     })
-// };
-
-
-// const getRoleArray = () => {
-//     let roleArray = [];
-//     connection.query('select * from roles', function (err, res) {
-//         if (err) throw err;
-//         for (i = 0; i < res.length; i++) {
-//             roleArray[res[i].id -1] = `${res[i].title}`;
-//         }
-//     return roleArray;
-//     })
-// };
-
 const updateEmployeeRole = () => {
     let employeeArray = [];
     connection.query('select * from employees', function (err, res) {
         if (err) throw err;
         for (i = 0; i < res.length; i++) {
-            employeeArray[res[i].id - 1] = `${res[i].last_name}, ${res[i].first_name}`;
+            employeeArray[res[i].id - 1] = `${res[i].last_name}, ${res[i].first_name}, ${res[i].id}`;
         }
 
         let roleArray = [];
         connection.query('select * from roles', function (err, res) {
             if (err) throw err;
             for (i = 0; i < res.length; i++) {
-                roleArray[res[i].id -1] = `${res[i].title}`;
+                roleArray[i] = `${res[i].title}, ${res[i].id}`;
+                // res[i].id -1
             }
             inquirer
                 .prompt([
@@ -252,16 +234,14 @@ const updateEmployeeRole = () => {
                     }
                 ])
                 .then(function(answer){
-                    //console.log(`id for this one is: ${(employeeArray.indexOf(answer.employee)) + 1}`)
-                    console.log(roleArray+" -111");
-                    console.log(answer+" -222");
-                    console.log(employeeArray.indexOf(answer.employee)+" -333");
+                    let empl = answer.employee.split(',');
+                    let rle = answer.role.split(',');
                     
-                    connection.query('update employees set role_id = ? where ?',
-                    [answer.role.id, answer.employee.id],
+                    connection.query('update employees set role_id = ? where id = ?',
+                    
+                    [rle[1], empl[2]],
                     (err, res) => {
                         if (err) throw err;
-                        //console.log('the employee role was updated successfully!');
                         promptUser();
                     });
                 });
