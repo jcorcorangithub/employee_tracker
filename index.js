@@ -121,14 +121,18 @@ const viewDepartments = () => {
         });
 };
 
+//this is creating the role but settings its department id to a different role
 const addRole = () => {
     let depArray = [];
     connection.query('select * from departments', function (err, res) {
         if (err) throw err;
         for (i = 0; i < res.length; i++) {
-            depArray[res[i].id - 1] = `${res[i].name}, ${res[i].id}`;
+            depArray[i] = `${res[i].name}, ${res[i].id}`;
         }
-        
+        if (depArray.length == 0){
+            console.log('you must first create a department before creating a role');
+            promptUser();
+        } else {
         inquirer
             .prompt([
                 {
@@ -164,7 +168,7 @@ const addRole = () => {
                         promptUser();
                 });
             });
-    })
+    }})
 };
 
 const viewRoles = () => {
@@ -178,14 +182,18 @@ const viewRoles = () => {
 
 
 //TODO add manager id
-const addEmployee = () => {
+const addEmployee = () => { 
     let roleArray = [];
     connection.query('select * from roles', function (err, res) {
         if (err) throw err;
         for (i = 0; i < res.length; i++) {
             roleArray[i] = `${res[i].title}, ${res[i].id}`;
             // res[i].id -1
-        }
+        };
+        if (roleArray.length == 0){
+            console.log('you must first create a role before creating an employee');
+            promptUser();
+        } 
     
     // let managerArray = [];
     // connection.query('select * from managers', function (err, res) {
@@ -194,7 +202,7 @@ const addEmployee = () => {
     //         managerArray[i] = `${res[i].title}, ${res[i].id}`;
     //         // res[i].id -1
     //     }
-
+        else {
         inquirer
         .prompt([
             {
@@ -246,7 +254,7 @@ const addEmployee = () => {
             //         promptUser();
             // });
         });
-    });
+    }});
 
     
 };
