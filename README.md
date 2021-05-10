@@ -6,7 +6,8 @@ The purpose of this assignment is to build a command-line application that manag
 link to github repo:
 https://github.com/jcorcorangithub/employee_tracker
 
-link to application:
+link to video:
+https://drive.google.com/file/d/1ezzb39FGhPPjvJt_WLET2Jo-k0tWUhu9/view
 
 ## Technologies
 JavaScript

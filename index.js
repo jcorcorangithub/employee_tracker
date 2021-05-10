@@ -107,7 +107,6 @@ const addDepartment = () => {
                 answer.name,
                 (err, res) => {
                     if (err) throw err;
-                    console.log('Your department was created successfully!');
                     promptUser();
                 })
         });
@@ -116,8 +115,18 @@ const addDepartment = () => {
 const viewDepartments = () => {
     connection.query(`select * from departments`,
         (err, res) => {
-            console.table(res);
-            promptUser();
+            let depArray = [];
+            for (i = 0; i < res.length; i++) {
+                depArray[i] = `${res[i].name}, ${res[i].id}`;
+            }
+            if(depArray.length == 0) {
+                console.log("\n-\n-\n-there are no departments created yet\n-\n-\n-");
+                promptUser();
+            }
+            else {
+                console.table(res);
+                promptUser();
+            }
         });
 };
 
@@ -130,7 +139,7 @@ const addRole = () => {
             depArray[i] = `${res[i].name}, ${res[i].id}`;
         }
         if (depArray.length == 0){
-            console.log('you must first create a department before creating a role');
+            console.log('\n-\n-\n-you must first create a department before creating a role\n-\n-\n-');
             promptUser();
         } else {
         inquirer
@@ -153,29 +162,33 @@ const addRole = () => {
                 }
             ])
             .then(function (answer) {
-                connection.query(
-                    'insert into roles (title, salary) values (?,?)',
-                    [answer.role, answer.salary],
-                    (err, res) => {
-                        if (err) throw err;
-                    })
                 let dep = answer.department.split(',');
                 connection.query(
-                    'insert into roles(department_id) values (?)',
-                    [dep[1]],
+                    'insert into roles (title, salary, department_id) values (?,?,?)',
+                    [answer.role, answer.salary, dep[1]],
                     (err, res) => {
                         if (err) throw err;
                         promptUser();
-                });
+                    });
             });
     }})
 };
 
 const viewRoles = () => {
-    connection.query(`select * from roles`,
+    connection.query(`select * from roles join departments on roles.department_id = departments.id`,
         (err, res) => {
-            console.table(res);
-            promptUser();
+            let roleArray = [];
+            for (i = 0; i < res.length; i++) {
+                roleArray[i] = `${res[i].name}, ${res[i].id}`;
+            }
+            if(roleArray.length == 0) {
+                console.log("\n-\n-\n-there are no roles created yet\n-\n-\n-");
+                promptUser();
+            }
+            else {
+                console.table(res);
+                promptUser();
+            }
         });
 
 };
@@ -191,7 +204,7 @@ const addEmployee = () => {
             // res[i].id -1
         };
         if (roleArray.length == 0){
-            console.log('you must first create a role before creating an employee');
+            console.log('\n-\n-\n-you must first create a role before creating an employee\n-\n-\n-');
             promptUser();
         } 
     
@@ -229,22 +242,14 @@ const addEmployee = () => {
             // }
         ])
         .then(function (answer) {
-            connection.query(
-                'insert into employees (first_name, last_name) values (?,?)',
-                [answer.employeefirstname, answer.employeelastname],
-                (err, res) => {
-                    if (err) throw err;
-                    console.log('the new employee was created successfully!');
-                    //promptUser();
-                })
             let role = answer.employeerole.split(',');
             connection.query(
-                'insert into employees (role_id) values (?)',
-                [role[1]],
+                'insert into employees (first_name, last_name, role_id) values (?,?,?)',
+                [answer.employeefirstname, answer.employeelastname, role[1]],
                 (err, res) => {
                     if (err) throw err;
                     promptUser();
-            });
+                });
             // let mng = answer.employeemanager.split(',');
             // connection.query(
             //     'insert into employees (manager_id) values (?)',
@@ -260,12 +265,22 @@ const addEmployee = () => {
 };
 
 const viewEmployees = () => {
-    connection.query(`select * from employees`,
+    // join roles on employees.role_id = roles.title
+    connection.query(`select * from employees join roles on employees.role_id = roles.id`,
         (err, res) => {
-            console.table(res);
-            promptUser();
+            let empArray = [];
+            for (i = 0; i < res.length; i++) {
+                empArray[i] = `${res[i].name}, ${res[i].id}`;
+            }
+            if(empArray.length == 0) {
+                console.log("\n-\n-\n-there are no employees created yet\n-\n-\n-");
+                promptUser();
+            }
+            else {
+                console.table(res);
+                promptUser();
+            }
         });
-
 };
 
 const updateEmployeeRole = () => {
@@ -275,13 +290,16 @@ const updateEmployeeRole = () => {
         for (i = 0; i < res.length; i++) {
             employeeArray[res[i].id - 1] = `${res[i].last_name}, ${res[i].first_name}, ${res[i].id}`;
         }
-
+        if (employeeArray.length == 0){
+            console.log('\n-\n-\n-you must first create an employee before updating an employee\n-\n-\n-');
+            promptUser();
+        } 
+        else {
         let roleArray = [];
         connection.query('select * from roles', function (err, res) {
             if (err) throw err;
             for (i = 0; i < res.length; i++) {
                 roleArray[i] = `${res[i].title}, ${res[i].id}`;
-                // res[i].id -1
             }
             inquirer
                 .prompt([
@@ -310,5 +328,5 @@ const updateEmployeeRole = () => {
                     });
                 });
         });
-    });
+    }});
 };

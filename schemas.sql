@@ -26,19 +26,19 @@ create table employees (
     constraint fk_manager foreign key (manager_id) references roles(id) 
 );
 
--- insert into departments (name) values
--- ("HR"),
--- ("Engineering"),
--- ("Medicine"),
--- ("Neurology"),
--- ("Robotics");
+insert into departments (name) values
+("HR"),
+("Robotics");
 
--- insert into roles (title, salary, department_id) values
+insert into roles (title, salary, department_id) values
+("intern", 13.5, 1),
+("counselor", 25, 1),
+("technician", 15, 2),
+("builder", 14.5, 2);
 
 
--- insert employees (first_name, last_name, role_id, manager_id)
--- values
--- ("John", "Doe", 1, NULL),
+insert employees (first_name, last_name, role_id, manager_id) values
+("John", "Doe", 3, NULL);
 -- ("Sally", "Smith", 2, Null);
 
 
